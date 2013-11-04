@@ -1,0 +1,60 @@
+I developed this game during the summer of 2012 (late may) as a part of my internship. I barely knew any C at that time (a bit of prior experience with java) and with just the MCu, LCD and the datasheet I figured out stuff on my own. This may not be 'clean code' (over use of global functions) , but was definitely worth the experience, and ignited my love for C. [ also reminds me how much my programming skills have improved since then ;) ]
+
+GAME SUMMARY:
+
+ The brick game or Tetris is built for a 48x84 nokia 3310 graphic LCD and is powered by a 12Mhz ATmega8.
+ We use 40x60 pixels of the screen to play the game and the rest is used for boundaries and score/level display.
+ The aim of our game is to complete the five levels in the game, each level being of increasing complexity. (ie the blocks start falling faster). 
+ Every time a line is deleted it is destroyed and the score increases by 1. To get through each level you have to get 5 points.
+ Once the bricks reach the top of the screen the game is over. 
+
+
+TECHNICAL INFORMATION:
+
+ connections
+ LCD ---------- BOARD
+ pin1:          +5V
+ pin2:          PB5
+ pin3:          PB3
+ pin4:          PB0
+ pin5:          PB2
+ pin6:          GND
+ pin7:          +5V
+ pin8:          PB1
+
+ Here I have used the SPI interface of the controller and have developed my custom driver code for this purpose.
+
+ pin C0, pin C1, pin C2, pin C3 have been configured as input pins. The gamer uses the switches connected to them to control the blocks. 
+
+ memory statastics
+
+ size after:
+AVR Memory Usage
+ ----------------
+ Device: atmega8
+
+ Program:    4674 bytes (57.1% Full)
+ (.text + .data + .bootloader)
+
+ Data:        912 bytes (89.1% Full)
+ (.data + .bss + .noinit)
+ 
+ Program Length: 731 lines.
+ Header Length:  223 lines.
+ Total Length:   954 lines.
+ FCPU = 12MHz
+
+PROGRAM LOGIC:
+ To make the bricks and the animation in the game I have implemented three char type arrays. blockFall[5][60], gameSetup[5][60], mainArray[5][60].
+ The blockFall contains the animation of the falling block and gameSetup contains the resting blocks already in place. Each element of both the array are 'or' ed and   written to corresponding position in the mainArray. this mainArray is written to the LCD. so we can see that the advantage of this type of programing is that all the   various components that we see in the screen are independent of each other (like the new falling block, the blocks previously in the game, and the data being written   to the LCD).
+ 1.The main(): calls initGame() and playGame(). 
+ 2.initGame(): calls initlcd(); and intiArray();
+ 3.initlcd(): initializes the LCD (i.e. sets the mode and contrast etc.)
+ 4.initArray(): initializes all the 3 arrays in the program and writes the 'GAME' and score and level.
+ 5.playGame(): is basically in the infinite loop of the main(). it has the random() which refreshes blockFall loads it with a new shape and contains another          conditional loop containing playBlock(). the loop is broken if the bottom of the  playing area or collision is detected.
+ 6.playBlock(): is basically for the animation of  the block falling down.It takes  care of sensing for collision with functions like collisionDetect()                  bottomReachDetect(). and also senses user commands, and calls correspondnig functions such as  goRight() goLeft() turnBlock() to modify the block. this playBlock       function is continously called for from playGame till collision occurs. after that this block is nolonger animated and instead a new block is created and it starts     falling. 
+ 7.lineCompleteDetect(): detects if any line is complete and deletes them.
+ 8.gameOverDetect():  if the top row is filled game is over.
+
+
+
